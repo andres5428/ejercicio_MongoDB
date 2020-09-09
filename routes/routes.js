@@ -14,7 +14,6 @@ async function validate(req, res, next) {
     return res.status(404).json({ message: 'El plato no existe' })
   }
   else {
-    // res.status(200).json({message: 'El plato si existe'})
     next()
   }
 }
@@ -53,8 +52,6 @@ router.post('/food', async (req, res) => {
   const client = await clientPromise;
   const database = client.db(DB_DATABASE);
   const collection = database.collection('comidas');
-  console.log(req.body)
-  console.log(req.body.origin)
   try {
     const data = await collection.save({ "name": req.body.name, "origin": req.body.origin });
     res.status(202).json(data);
@@ -66,12 +63,12 @@ router.post('/food', async (req, res) => {
 /**
  * Put - Modificar un plato de comida
  */
-router.put('/food/', async (req, res) => {
+router.put('/food/:name',validate, async (req, res) => {
   const client = await clientPromise;
   const database = client.db(DB_DATABASE);
   const collection = database.collection('comidas');
   try {
-    const data = await collection.update({ "name": req.body.name }, { "name": req.body.modifyname })
+    const data = await collection.update({ "name": req.params.name }, { "name": req.body.modifyname })
     res.status(202).json(data); // arreglar el $set
   } catch (error) {
     res.status(500).json({ message: error.message });
@@ -81,12 +78,12 @@ router.put('/food/', async (req, res) => {
 /**
  * Delete - Modificar un plato de comida
  */
-router.delete('/food/', async (req, res) => {
+router.delete('/food/:name', validate,async (req, res) => {
   const client = await clientPromise;
   const database = client.db(DB_DATABASE);
   const collection = database.collection('comidas');
   try {
-    const data = await collection.remove({ "name": req.body.name })
+    const data = await collection.remove({ "name": req.params.name })
     res.status(202).json(data);
   } catch (error) {
     res.status(500).json({ message: error.message });
